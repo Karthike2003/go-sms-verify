@@ -8,15 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/Karthike2003/go-sms-verify-yt/data"
 )
+const appTimeout = time.Second * 10
 func (app *Config) sendOTP() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		_,cancel := context.WithTimeout(context.Background(), appTimeout)
 		var payload data.OTPData
 		defer cancel()
 
-		app.validatiteBody(c, &payload)
+		app.validateBody(c, &payload)
 
-		newData := data.OTP{
+		newData := data.OTPData{
 			PhoneNumber: payload.PhoneNumber,
 		}
 
@@ -37,7 +38,7 @@ func (app *Config) verifyOTP() gin.HandlerFunc {
 		var payload data.VerifyData
 		defer cancel()
 
-		app.validatiteBody(c, &payload)
+		app.validateBody(c, &payload)
 
 		newData := data.VerifyData{
 			User: payload.User,
@@ -45,7 +46,8 @@ func (app *Config) verifyOTP() gin.HandlerFunc {
 		}
 
 		//check if code is valid
-		_,err := app.twilioVerifyOTP(newData.User.PhoneNumber, newData.Code)
+		err := app.twilioVerifyOTP(newData.User.PhoneNumber, newData.Code)
+		fmt.Println("err: ", err)
 		if err != nil {
 			app.errorJSON(c, err)
 			return
