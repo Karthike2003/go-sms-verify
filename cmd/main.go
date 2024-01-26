@@ -12,7 +12,7 @@ func main() {
 	app := api.Config{Router: router}
 
 	//routes
-	api.Routes(r)
+	app.Routes()
 
 	router.Run(":8080")
 }
